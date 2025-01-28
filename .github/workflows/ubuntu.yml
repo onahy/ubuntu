@@ -4,33 +4,33 @@ on: workflow_dispatch
 
 jobs:
   vds:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
-      max-parallel: 2
+      max-parallel: 3  # Maksimum 3 paralel iş
       matrix:
-        instance: [1, 2]
+        instance: [1, 2, 3]  # 3 VDS instance
     name: VDS Instance ${{ matrix.instance }}
-    timeout-minutes: 360
     
     steps:
-    - name: Hızlı Kurulum
+    - name: VDS Başlat
+      uses: actions/checkout@v2
+    
+    - name: Tmate Kurulumu
       run: |
-        sudo apt-get update -qq > /dev/null 2>&1
-        sudo apt-get install -y tmate -qq > /dev/null 2>&1
+        sudo apt update
+        sudo apt install tmate -y
         
-    - name: SSH Bağlantısı Oluştur
+    - name: Tmate Oturumu Başlat
       run: |
         tmate -S /tmp/tmate.sock new-session -d
         tmate -S /tmp/tmate.sock wait tmate-ready
-        echo "🖥️ VDS #${{ matrix.instance }}:"
+        echo "🖥️ VDS #${{ matrix.instance }} SSH Bağlantısı:"
         tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
         
-    - name: Çalışır Tut
+    - name: VDS'i Çalışır Tutma
       run: |
         while true; do
-          sleep 300
-          if ! tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}' > /dev/null 2>&1; then
-            exit 1
-          fi
+          sleep 60
+          echo "🔄 VDS #${{ matrix.instance }} SSH Bağlantısı Yenilendi:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
         done 
