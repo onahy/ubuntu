@@ -6,30 +6,24 @@ jobs:
   vds:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
+      max-parallel: 3
       matrix:
-        instance: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        instance: [1, 2, 3]
     name: VDS Instance ${{ matrix.instance }}
     
     steps:
-    - name: VDS Başlat
-      uses: actions/checkout@v2
-    
-    - name: Tmate Kurulumu
+    - name: Hızlı Kurulum
       run: |
-        sudo apt update
-        sudo apt install tmate -y
+        sudo apt-get update > /dev/null 2>&1
+        sudo apt-get install -y tmate > /dev/null 2>&1
         
-    - name: Tmate Oturumu Başlat
+    - name: SSH Bağlantısı Oluştur
       run: |
         tmate -S /tmp/tmate.sock new-session -d
         tmate -S /tmp/tmate.sock wait tmate-ready
-        echo "🖥️ VDS #${{ matrix.instance }} SSH Bağlantısı:"
+        echo "🖥️ VDS #${{ matrix.instance }}:"
         tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
         
-    - name: VDS'i Çalışır Tutma
-      run: |
-        while true; do
-          sleep 60
-          echo "🔄 VDS #${{ matrix.instance }} SSH Bağlantısı Yenilendi:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-        done 
+    - name: Çalışır Tut
+      run: sleep 21600 # 6 saat 
