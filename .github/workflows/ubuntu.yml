@@ -6,9 +6,9 @@ jobs:
   vds:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 3  # Maksimum 3 paralel iş
+      fail-fast: false
       matrix:
-        instance: [1, 2, 3]  # 3 VDS instance
+        instance: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     name: VDS Instance ${{ matrix.instance }}
     
     steps:
