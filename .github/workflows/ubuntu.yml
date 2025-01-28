@@ -5,22 +5,24 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6 saat
-    
     steps:
-    - name: Setup System
+    - name: VDS Başlat
+      uses: actions/checkout@v2
+    
+    - name: Tmate Kurulumu
       run: |
-        sudo apt-get update
-        sudo apt-get install -y tmate openssh-server net-tools
+        sudo apt update
+        sudo apt install tmate -y
         
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      with:
-        limit-access-to-actor: true
+    - name: Tmate Oturumu Başlat
+      run: |
+        tmate -S /tmp/tmate.sock new-session -d
+        tmate -S /tmp/tmate.sock wait tmate-ready
+        tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
         
-    - name: Keep Alive
+    - name: VDS'i Çalışır Tutma
       run: |
         while true; do
-          echo "System active..."
-          sleep 300
+          sleep 60
+          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
         done 
