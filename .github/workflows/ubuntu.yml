@@ -1,4 +1,4 @@
-name: Ubuntu Environment
+name: Ubuntu VDS
 
 on: workflow_dispatch
 
@@ -6,20 +6,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 360  # 6 saat
-
-    steps:
-    - uses: actions/checkout@v2
     
-    - name: Setup Environment
+    steps:
+    - name: Setup SSH
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3 python3-pip
-        pip3 install selenium requests
+        sudo apt-get install -y openssh-server net-tools
+        sudo service ssh start
+        echo "SSH_PASSWORD=123456789" >> $GITHUB_ENV
+        sudo useradd -m -s /bin/bash runner
+        echo "runner:${{ env.SSH_PASSWORD }}" | sudo chpasswd
         
-    - name: Setup Chrome
+    - name: Get IP
       run: |
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo apt install ./google-chrome-stable_current_amd64.deb
+        echo "Public IP: $(curl -s ifconfig.me)"
+        echo "SSH Bilgileri:"
+        echo "Kullanıcı: runner"
+        echo "Şifre: ${{ env.SSH_PASSWORD }}"
+        echo "Port: 22"
         
-    - name: Run Script
-      run: python3 bot.py 
+    - name: Keep Alive
+      run: |
+        while true; do
+          echo "System active..."
+          sleep 300
+        done 
