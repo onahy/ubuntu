@@ -1,0 +1,25 @@
+name: Ubuntu Environment
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 saat
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup Environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip
+        pip3 install selenium requests
+        
+    - name: Setup Chrome
+      run: |
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_amd64.deb
+        
+    - name: Run Script
+      run: python3 bot.py 
