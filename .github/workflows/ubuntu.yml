@@ -8,22 +8,15 @@ jobs:
     timeout-minutes: 360  # 6 saat
     
     steps:
-    - name: Setup SSH
+    - name: Setup System
       run: |
         sudo apt-get update
-        sudo apt-get install -y openssh-server net-tools
-        sudo service ssh start
-        echo "SSH_PASSWORD=123456789" >> $GITHUB_ENV
-        sudo useradd -m -s /bin/bash runner
-        echo "runner:${{ env.SSH_PASSWORD }}" | sudo chpasswd
+        sudo apt-get install -y tmate openssh-server net-tools
         
-    - name: Get IP
-      run: |
-        echo "Public IP: $(curl -s ifconfig.me)"
-        echo "SSH Bilgileri:"
-        echo "Kullanıcı: runner"
-        echo "Şifre: ${{ env.SSH_PASSWORD }}"
-        echo "Port: 22"
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
         
     - name: Keep Alive
       run: |
