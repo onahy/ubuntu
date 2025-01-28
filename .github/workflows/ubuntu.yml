@@ -4,19 +4,20 @@ on: workflow_dispatch
 
 jobs:
   vds:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 2
       matrix:
-        instance: [1, 2, 3]
+        instance: [1, 2]
     name: VDS Instance ${{ matrix.instance }}
+    timeout-minutes: 360
     
     steps:
     - name: Hızlı Kurulum
       run: |
-        sudo apt-get update > /dev/null 2>&1
-        sudo apt-get install -y tmate > /dev/null 2>&1
+        sudo apt-get update -qq > /dev/null 2>&1
+        sudo apt-get install -y tmate -qq > /dev/null 2>&1
         
     - name: SSH Bağlantısı Oluştur
       run: |
@@ -26,4 +27,10 @@ jobs:
         tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
         
     - name: Çalışır Tut
-      run: sleep 21600 # 6 saat 
+      run: |
+        while true; do
+          sleep 300
+          if ! tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}' > /dev/null 2>&1; then
+            exit 1
+          fi
+        done 
