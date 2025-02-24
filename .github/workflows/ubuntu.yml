@@ -1,36 +1,22 @@
-name: Ubuntu VDS
+name: Programmingwithkumaresan
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 jobs:
-  vds:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        instance: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    name: VDS Instance ${{ matrix.instance }}
+  build:
+    name: Start Building...
+    runs-on: windows-latest
+    timeout-minutes: 9999
     
     steps:
-    - name: VDS Başlat
-      uses: actions/checkout@v2
-    
-    - name: Tmate Kurulumu
-      run: |
-        sudo apt update
-        sudo apt install tmate -y
-        
-    - name: Tmate Oturumu Başlat
-      run: |
-        tmate -S /tmp/tmate.sock new-session -d
-        tmate -S /tmp/tmate.sock wait tmate-ready
-        echo "🖥️ VDS #${{ matrix.instance }} SSH Bağlantısı:"
-        tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-        
-    - name: VDS'i Çalışır Tutma
-      run: |
-        while true; do
-          sleep 60
-          echo "🔄 VDS #${{ matrix.instance }} SSH Bağlantısı Yenilendi:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-        done 
+      - name: Downloading & Installing Essentials
+        run: |
+          Invoke-WebRequest -Uri "https://gitlab.com/chamod12/lm_win-10_github_rdp/-/raw/main/Downloads.bat" -OutFile "Downloads.bat"
+          cmd /c Downloads.bat
+
+      - name: Connect to LiteManager
+        run: cmd /c show.bat
+
+      - name: Time Counter
+        run: cmd /c loop.bat
